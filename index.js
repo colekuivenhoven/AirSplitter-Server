@@ -58,12 +58,16 @@ app.get('/', (req, res) => {
 });
 
 app.get('/file/get-zip/:name', (req, res) => {
-    res.sendFile(path.join(__dirname, 'output', req.params.name));
+    res.sendFile(path.join(__dirname, 'output', req.params.name+".zip"));
+    setTimeout(() => {
+        let toDelete_zip = path.join(__dirname, 'output', req.params.name+".zip");
+        deleteFile(toDelete_zip);
+    }, 60000);
 });
 
-app.get('/song/get-isolated/:name/:type', (req, res) => {
-    res.sendFile(path.join(__dirname, 'output', req.params.name, req.params.type));
-});
+// app.get('/song/get-isolated/:name/:type', (req, res) => {
+//     res.sendFile(path.join(__dirname, 'output', req.params.name, req.params.type));
+// });
 
 app.get('/song/get-original/:name', (req, res) => {
     res.sendFile(path.join(__dirname, 'original_audio', req.params.name));
@@ -111,12 +115,14 @@ app.get('/song-2stem/convert/:song', (req, res) => {
         console.log(`child process close all stdio with code ${code}`);
 
         let toDelete_path = path.join(__dirname, 'original_audio', song);
-        fs.unlink(toDelete_path, (err) => {
-            if (err) throw err;
-            console.log(`${toDelete_path} was removed`);
-        });
+        deleteFile(toDelete_path);
 
         zipOutput(song.substring(0, song.lastIndexOf('.')));
+
+        setTimeout(() => {
+            let toDelete_zip = path.join(__dirname, 'output', song.substring(0, song.lastIndexOf('.'))+'.zip');
+            deleteFile(toDelete_zip);
+        }, 900000);
 
         res.status(200).json({
             path_name: path.parse(song).name,
@@ -188,4 +194,15 @@ function zipOutput(name) {
     archive.directory(__dirname+'/output/'+`${name}`, false);
     
     archive.finalize();
+}
+
+function deleteFile(path) {
+    fs.unlink(path, (err) => {
+        if (err) {
+            console.log(err);
+        }
+        else {
+            console.log(`${path} was removed`);
+        }
+    });
 }

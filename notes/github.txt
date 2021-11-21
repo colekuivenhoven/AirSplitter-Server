@@ -1,0 +1,11 @@
+// Add all to local repo
+git add .
+
+// Commit local repo with message
+git commit -m "Added autodelete and zipping ability"
+
+// Push to remote repo
+git push -u origin main
+
+// Pull changes
+git pull
